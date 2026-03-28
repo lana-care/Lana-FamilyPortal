@@ -51,7 +51,7 @@ export default defineNuxtConfig({
     public: {
       apiUrl: process.env.NUXT_PUBLIC_API_URL || 'http://localhost:4000',
       appName: 'Carerpoint Family Portal',
-      appVersion: '1.0.0',
+      appVersion: 'v1.0',
     },
   },
 
