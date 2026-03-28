@@ -1,0 +1,387 @@
+@import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&display=swap');
+
+@custom-variant dark (&:is(.dark *));
+
+@font-face {
+  font-family: 'Oddval';
+  src: url('/fonts/Oddval-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Oddval';
+  src: url('/fonts/Oddval-SemiBoldItalic.ttf') format('truetype');
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+/* ============================================
+   LANA - Tailwind 4 Custom Theme
+   Color Palette:
+     1: #1e5cab (Primary Blue)
+     2: #fdfef9 (Cream White)
+     3: #5583b7 (Medium Blue)
+     4: #dbf26d (Lime Accent)
+     5: #79a5a5 (Sage Teal)
+   Font: Oddval
+   ============================================ */
+
+@theme {
+  /* Lana Blue scale */
+  --color-lana-*: initial;
+  --color-lana-50: #eef4fb;
+  --color-lana-100: #d5e3f5;
+  --color-lana-200: #aac7eb;
+  --color-lana-300: #7faade;
+  --color-lana-400: #5583b7;
+  --color-lana-500: #1e5cab;
+  --color-lana-600: #1a509a;
+  --color-lana-700: #154283;
+  --color-lana-800: #11356b;
+  --color-lana-900: #0d2854;
+  --color-lana-950: #081a38;
+
+  /* Lana Lime scale */
+  --color-lime-*: initial;
+  --color-lime-50: #fafee8;
+  --color-lime-100: #f3fcc4;
+  --color-lime-200: #e9f98e;
+  --color-lime-300: #dbf26d;
+  --color-lime-400: #c8e040;
+  --color-lime-500: #a9c020;
+  --color-lime-600: #849818;
+  --color-lime-700: #637114;
+  --color-lime-800: #4e5a14;
+  --color-lime-900: #424c16;
+  --color-lime-950: #222a08;
+
+  /* Lana Sage/Teal scale */
+  --color-sage-*: initial;
+  --color-sage-50: #f0f7f7;
+  --color-sage-100: #daeaea;
+  --color-sage-200: #b8d5d5;
+  --color-sage-300: #8ebaba;
+  --color-sage-400: #79a5a5;
+  --color-sage-500: #5a8888;
+  --color-sage-600: #486e6e;
+  --color-sage-700: #3d5b5b;
+  --color-sage-800: #354c4c;
+  --color-sage-900: #2f4141;
+  --color-sage-950: #1a2626;
+
+  /* Warning (amber) */
+  --color-warning-*: initial;
+  --color-warning-50: #fffbeb;
+  --color-warning-100: #fef3c7;
+  --color-warning-200: #fde68a;
+  --color-warning-300: #fcd34d;
+  --color-warning-400: #fbbf24;
+  --color-warning-500: #f59e0b;
+  --color-warning-600: #d97706;
+  --color-warning-700: #b45309;
+  --color-warning-800: #92400e;
+  --color-warning-900: #78350f;
+  --color-warning-950: #451a03;
+
+  /* Danger (red) */
+  --color-danger-*: initial;
+  --color-danger-50: #fef2f2;
+  --color-danger-100: #fee2e2;
+  --color-danger-200: #fecaca;
+  --color-danger-300: #fca5a5;
+  --color-danger-400: #f87171;
+  --color-danger-500: #ef4444;
+  --color-danger-600: #dc2626;
+  --color-danger-700: #b91c1c;
+  --color-danger-800: #991b1b;
+  --color-danger-900: #7f1d1d;
+  --color-danger-950: #450a0a;
+}
+
+/* ============================================
+   LANA - Shadcn-vue Theme Variables
+   ============================================ */
+
+@theme inline {
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* ---- Light Mode ---- */
+:root {
+  --radius: 0.625rem;
+  /* Background: cream white #fdfef9 */
+  --background: #fdfef9;
+  --foreground: #0d2854;
+  /* Cards: pure white on cream */
+  --card: #ffffff;
+  --card-foreground: #0d2854;
+  --popover: #ffffff;
+  --popover-foreground: #0d2854;
+  /* Primary: Lana Blue #1e5cab */
+  --primary: #1e5cab;
+  --primary-foreground: #ffffff;
+  /* Secondary: light blue tint */
+  --secondary: #eef4fb;
+  --secondary-foreground: #11356b;
+  /* Muted: sage teal tint */
+  --muted: #f0f5f5;
+  --muted-foreground: #486e6e;
+  /* Accent: lime tint */
+  --accent: #f5fad4;
+  --accent-foreground: #3d5a0a;
+  /* Destructive */
+  --destructive: #ef4444;
+  /* Borders: blue-gray */
+  --border: #d5e3f0;
+  --input: #d5e3f0;
+  --ring: #1e5cab;
+  /* Charts: Lana palette */
+  --chart-1: #1e5cab;
+  --chart-2: #dbf26d;
+  --chart-3: #5583b7;
+  --chart-4: #79a5a5;
+  --chart-5: #154283;
+  /* Sidebar */
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0d2854;
+  --sidebar-primary: #1e5cab;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #eef4fb;
+  --sidebar-accent-foreground: #11356b;
+  --sidebar-border: #d5e3f0;
+  --sidebar-ring: #1e5cab;
+}
+
+/* ---- Dark Mode ---- */
+.dark {
+  /* Background: deep navy */
+  --background: #0a1929;
+  --foreground: #e8ecf2;
+  /* Cards: dark navy */
+  --card: #0f2744;
+  --card-foreground: #e8ecf2;
+  --popover: #0f2744;
+  --popover-foreground: #e8ecf2;
+  /* Primary: medium blue for dark mode contrast */
+  --primary: #5583b7;
+  --primary-foreground: #ffffff;
+  /* Secondary */
+  --secondary: #132e4f;
+  --secondary-foreground: #d5e3f5;
+  /* Muted */
+  --muted: #132e4f;
+  --muted-foreground: #79a5a5;
+  /* Accent: lime stays vibrant */
+  --accent: #1e2e12;
+  --accent-foreground: #dbf26d;
+  /* Destructive */
+  --destructive: #b91c1c;
+  /* Borders */
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.12);
+  --ring: #5583b7;
+  /* Charts */
+  --chart-1: #5583b7;
+  --chart-2: #dbf26d;
+  --chart-3: #79a5a5;
+  --chart-4: #aac7eb;
+  --chart-5: #e9f98e;
+  /* Sidebar */
+  --sidebar: #0b1e35;
+  --sidebar-foreground: #e8ecf2;
+  --sidebar-primary: #5583b7;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #132e4f;
+  --sidebar-accent-foreground: #d5e3f5;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #5583b7;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    @apply w-1.5 h-1.5;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full;
+    background: #79a5a5;
+    opacity: 0.5;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #5a8888;
+  }
+
+  .dark ::-webkit-scrollbar-thumb {
+    background: #354c4c;
+  }
+
+  .dark ::-webkit-scrollbar-thumb:hover {
+    background: #486e6e;
+  }
+}
+
+.font-display {
+  font-family: 'Oddval', 'Space Grotesk', serif;
+}
+
+@layer utilities {
+  /* Animation utilities */
+  .animate-fade-in {
+    animation: fadeIn 0.2s ease-in-out;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.3s ease-out;
+  }
+
+  .animate-pulse-soft {
+    animation: pulseSoft 2s ease-in-out infinite;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes pulseSoft {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+  }
+
+  /* Truncate multi-line */
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* Dashed ring for AI-suggested items */
+  .ring-dashed {
+    --tw-ring-style: dashed;
+  }
+
+  /* Page slide transition (Nuxt pageTransition) */
+  .page-slide-enter-active {
+    transition: opacity 0.2s ease-out, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .page-slide-leave-active {
+    transition: opacity 0.12s ease-in, transform 0.12s ease-in;
+  }
+  .page-slide-enter-from {
+    opacity: 0;
+    transform: translateX(12px);
+  }
+  .page-slide-leave-to {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+}
+
+/* Sonner toasts: use app theme (--background, --foreground, --border) so they match light/dark mode */
+[data-sonner-toaster] {
+  --normal-bg: var(--background);
+  --normal-text: var(--foreground);
+  --normal-border: var(--border);
+  --success-bg: var(--background);
+  --success-text: var(--foreground);
+  --success-border: var(--border);
+  --error-bg: var(--background);
+  --error-text: var(--foreground);
+  --error-border: var(--destructive);
+  --warning-bg: var(--background);
+  --warning-text: var(--foreground);
+  --warning-border: var(--color-warning-500);
+}
+[data-sonner-toast] {
+  background: var(--background) !important;
+  color: var(--foreground) !important;
+  border-color: var(--border) !important;
+  box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+[data-sonner-toast][data-type='success'] {
+  border-color: var(--border) !important;
+}
+[data-sonner-toast][data-type='error'] {
+  border-color: var(--destructive) !important;
+}
+[data-sonner-toast][data-type='warning'] {
+  border-color: var(--color-warning-500) !important;
+}
+[data-sonner-toast] [data-title],
+[data-sonner-toast] [data-description] {
+  color: inherit;
+}
+[data-sonner-toast] [data-description] {
+  opacity: 0.85;
+}
