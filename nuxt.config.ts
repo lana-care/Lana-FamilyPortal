@@ -12,24 +12,7 @@ export default defineNuxtConfig({
     host: 'localhost',
   },
 
-  modules: ['@nuxtjs/supabase', '@nuxtjs/i18n', '@vueuse/nuxt', '@nuxt/eslint', 'shadcn-nuxt', '@pinia/nuxt'],
-
-  i18n: {
-    locales: [
-      { code: 'en', iso: 'en', name: 'English', file: 'en.json', lang: 'en' },
-      { code: 'fr', iso: 'fr', name: 'Français', file: 'fr.json', lang: 'fr' },
-    ],
-    defaultLocale: 'en',
-    strategy: 'prefix_except_default',
-    lazy: false,
-    langDir: 'locales',
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: 'carerpoint_family_i18n',
-      redirectOn: 'root',
-      fallbackLocale: 'en',
-    },
-  },
+  modules: ['@nuxtjs/supabase', '@vueuse/nuxt', '@nuxt/eslint', 'shadcn-nuxt', '@pinia/nuxt'],
 
   shadcn: {
     prefix: '',
