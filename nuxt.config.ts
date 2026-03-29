@@ -12,22 +12,11 @@ export default defineNuxtConfig({
     host: 'localhost',
   },
 
-  modules: ['@nuxtjs/supabase', '@vueuse/nuxt', '@nuxt/eslint', 'shadcn-nuxt', '@pinia/nuxt'],
+  modules: ['@vueuse/nuxt', '@nuxt/eslint', 'shadcn-nuxt', '@pinia/nuxt'],
 
   shadcn: {
     prefix: '',
     componentDir: './app/components/ui',
-  },
-
-  supabase: {
-    url: process.env.NUXT_PUBLIC_SUPABASE_URL ?? process.env.SUPABASE_URL ?? '',
-    key: process.env.NUXT_PUBLIC_SUPABASE_KEY ?? process.env.SUPABASE_KEY ?? '',
-    redirect: false,
-    redirectOptions: {
-      login: '/login',
-      callback: '/login',
-      exclude: ['/', '/login', '/schedule', '/documents', '/feedback', '/visits/*'],
-    },
   },
 
   runtimeConfig: {
