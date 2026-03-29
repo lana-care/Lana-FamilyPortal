@@ -58,6 +58,15 @@ export default defineNuxtConfig({
     },
   },
 
+  nitro: {
+    preset: 'cloudflare-module',
+    cloudflare: {
+      wrangler: {
+        name: 'familyportal',
+      },
+    },
+  },
+
   vite: {
     ssr: {
       external: [
