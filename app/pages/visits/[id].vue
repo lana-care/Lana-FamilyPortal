@@ -4,7 +4,7 @@
       <NuxtLink to="/" class="text-sm text-primary">← Home</NuxtLink>
       <h1 class="text-sm font-semibold">Visit detail</h1>
     </header>
-    <div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="max-w-3xl mx-auto px-4 py-6 space-y-6">
       <div v-if="loading" class="flex justify-center py-12">
         <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
@@ -26,26 +26,67 @@
             <p>{{ visit.foodIntake }}</p>
           </div>
           <div v-if="visit.notes">
-            <span class="text-xs font-semibold text-muted-foreground uppercase">Notes</span>
+            <span class="text-xs font-semibold text-muted-foreground uppercase">Carer notes</span>
             <p class="whitespace-pre-wrap">{{ visit.notes }}</p>
           </div>
         </CardContent>
       </Card>
       <p v-else class="text-sm text-muted-foreground text-center py-12">Visit not found.</p>
+
+      <Card v-if="visit && token">
+        <CardHeader>
+          <CardTitle class="text-sm">Your notes on this visit</CardTitle>
+          <p class="text-xs text-muted-foreground font-normal">
+            Available when the visit is completed or reviewed.
+          </p>
+        </CardHeader>
+        <CardContent class="space-y-3 text-sm">
+          <div v-for="n in familyNotes" :key="n.id" class="rounded-md border bg-muted/20 p-3">
+            <p class="whitespace-pre-wrap">{{ n.note }}</p>
+            <p class="text-[10px] text-muted-foreground mt-2">{{ formatDt(n.created_at) }}</p>
+          </div>
+          <template v-if="canAddNote">
+            <textarea
+              v-model="noteDraft"
+              rows="3"
+              class="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+              placeholder="Leave a note for the care team…"
+            />
+            <button
+              type="button"
+              class="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground disabled:opacity-50"
+              :disabled="noteSaving || !noteDraft.trim()"
+              @click="submitNote"
+            >
+              {{ noteSaving ? 'Saving…' : 'Submit note' }}
+            </button>
+          </template>
+        </CardContent>
+      </Card>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { Badge } from '~/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardContent } from '~/components/ui/card'
 import type { FamilyPortalVisit } from '~/composables/usePortalAuth'
 
 definePageMeta({ layout: false })
 
 const route = useRoute()
+const config = useRuntimeConfig()
 const { token, portalData, fetchPortal } = usePortalAuth()
 const loading = ref(true)
-const visit = ref<FamilyPortalVisit | null>(null)
+const visit = ref<(FamilyPortalVisit & { id?: string }) | null>(null)
+const familyNotes = ref<{ id: string; note: string; created_at: string }[]>([])
+const noteDraft = ref('')
+const noteSaving = ref(false)
+
+const canAddNote = computed(() => {
+  const s = String(visit.value?.status || '').toLowerCase()
+  return ['completed', 'reviewed'].includes(s)
+})
 
 function formatDate(date: string) {
   if (!date) return ''
@@ -57,16 +98,71 @@ function formatDate(date: string) {
   })
 }
 
+function formatDt(s: string) {
+  try {
+    return new Date(s).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })
+  } catch {
+    return s
+  }
+}
+
+async function loadNotes(visitId: string) {
+  if (!token.value) return
+  try {
+    const base = String(config.public.apiUrl || '').replace(/\/+$/, '')
+    const res = await $fetch<{ valid?: boolean; data?: typeof familyNotes.value }>(
+      `${base}/api/v1/family-portal/visits/${visitId}/notes?token=${encodeURIComponent(token.value)}`,
+    )
+    familyNotes.value = res?.valid && Array.isArray(res.data) ? res.data : []
+  } catch {
+    familyNotes.value = []
+  }
+}
+
+async function submitNote() {
+  const id = visit.value?.id
+  if (!token.value || !id || !noteDraft.value.trim()) return
+  noteSaving.value = true
+  try {
+    const base = String(config.public.apiUrl || '').replace(/\/+$/, '')
+    await $fetch(
+      `${base}/api/v1/family-portal/visits/${id}/notes?token=${encodeURIComponent(token.value)}`,
+      { method: 'POST', body: { note: noteDraft.value.trim() } },
+    )
+    noteDraft.value = ''
+    await loadNotes(id)
+  } finally {
+    noteSaving.value = false
+  }
+}
+
 onMounted(async () => {
   const id = route.params.id as string
   if (token.value && !portalData.value?.valid) {
     await fetchPortal()
+  }
+  const base = String(config.public.apiUrl || '').replace(/\/+$/, '')
+  if (token.value) {
+    try {
+      const summary = await $fetch<{ valid?: boolean; visit?: FamilyPortalVisit & { id: string } }>(
+        `${base}/api/v1/family-portal/visits/${id}?token=${encodeURIComponent(token.value)}`,
+      )
+      if (summary?.valid && summary.visit) {
+        visit.value = { ...summary.visit, id }
+        await loadNotes(id)
+        loading.value = false
+        return
+      }
+    } catch {
+      // fallback to bundle
+    }
   }
   const all = [
     ...(portalData.value?.recentVisits || []),
     ...(portalData.value?.upcomingVisits || []),
   ] as FamilyPortalVisit[]
   visit.value = all.find((v) => v.id === id) || null
+  if (visit.value?.id && token.value) await loadNotes(visit.value.id as string)
   loading.value = false
 })
 </script>
