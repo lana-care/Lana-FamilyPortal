@@ -9,6 +9,39 @@
         <NuxtLink to="/login" class="text-primary underline">Sign in with your access link</NuxtLink>
       </div>
       <template v-else>
+        <div class="flex rounded-lg border p-1 bg-muted/30 gap-1">
+          <button
+            type="button"
+            class="flex-1 rounded-md px-3 py-2 text-xs font-medium transition-colors"
+            :class="
+              activeChannel === 'group'
+                ? 'bg-background shadow-sm text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            @click="activeChannel = 'group'"
+          >
+            Family &amp; agency
+          </button>
+          <button
+            type="button"
+            class="flex-1 rounded-md px-3 py-2 text-xs font-medium transition-colors"
+            :class="
+              activeChannel === 'private'
+                ? 'bg-background shadow-sm text-foreground'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            @click="activeChannel = 'private'"
+          >
+            Private with agency
+          </button>
+        </div>
+        <p class="text-[11px] text-muted-foreground">
+          {{
+            activeChannel === 'group'
+              ? 'Messages visible to all linked family members and the agency.'
+              : 'Only you and the agency see this thread.'
+          }}
+        </p>
         <div v-if="loading" class="flex justify-center py-12">
           <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
         </div>
@@ -19,18 +52,22 @@
             class="rounded-lg border p-3 text-sm"
             :class="m.direction === 'inbound' ? 'bg-primary/5 border-primary/20' : 'bg-muted/30'"
           >
-            <p class="text-xs text-muted-foreground mb-1 capitalize">{{ m.direction || 'message' }}</p>
+            <p class="text-xs font-semibold text-muted-foreground mb-1">
+              {{ messageFromLabel(m) }}
+            </p>
             <p class="whitespace-pre-wrap">{{ m.content }}</p>
             <p v-if="m.created_at" class="text-[10px] text-muted-foreground mt-2">
               {{ formatDt(m.created_at) }}
             </p>
           </div>
           <div v-if="!thread.length" class="text-sm text-muted-foreground text-center py-8">
-            No messages yet.
+            No messages in this thread yet.
           </div>
         </div>
         <div class="pt-4 border-t space-y-2">
-          <label class="text-xs font-medium text-muted-foreground">Message the agency</label>
+          <label class="text-xs font-medium text-muted-foreground">
+            {{ activeChannel === 'private' ? 'Message the agency (private)' : 'Message the agency' }}
+          </label>
           <textarea
             v-model="draft"
             rows="3"
@@ -57,15 +94,35 @@ import { toast } from 'vue-sonner'
 
 definePageMeta({ layout: false })
 
+type MsgRow = {
+  id?: string
+  content?: string
+  direction?: string
+  created_at?: string
+  channel_type?: string
+  sender_name?: string | null
+}
+
 const config = useRuntimeConfig()
 const { token, fetchPortal, portalData } = usePortalAuth()
 
 const loading = ref(true)
 const sending = ref(false)
 const draft = ref('')
-const thread = ref<Array<{ id?: string; content?: string; direction?: string; created_at?: string }>>([])
+const thread = ref<MsgRow[]>([])
+const activeChannel = ref<'group' | 'private'>('group')
 
 let socket: Socket | null = null
+
+function messageChannel(row: MsgRow): 'group' | 'private' {
+  return row.channel_type === 'private' ? 'private' : 'group'
+}
+
+function messageFromLabel(m: MsgRow) {
+  if (m.direction === 'outbound') return 'Agency'
+  const n = (m.sender_name || '').trim()
+  return n || 'Family member'
+}
 
 function formatDt(s: string) {
   try {
@@ -75,13 +132,9 @@ function formatDt(s: string) {
   }
 }
 
-function mergeMessage(row: {
-  id?: string
-  content?: string
-  direction?: string
-  created_at?: string
-}) {
+function mergeMessage(row: MsgRow) {
   if (!row?.id && !row?.content) return
+  if (messageChannel(row) !== activeChannel.value) return
   const exists = thread.value.some((m) => row.id && m.id === row.id)
   if (exists) return
   thread.value = [...thread.value, row]
@@ -95,14 +148,16 @@ async function load() {
   loading.value = true
   try {
     const base = String(config.public.apiUrl || '').replace(/\/+$/, '')
-    const res = await $fetch<{ valid?: boolean; messages?: typeof thread.value }>(
-      `${base}/api/v1/family-portal/messages?token=${encodeURIComponent(token.value)}`,
+    const ch = activeChannel.value
+    const res = await $fetch<{ valid?: boolean; messages?: MsgRow[] }>(
+      `${base}/api/v1/family-portal/messages?token=${encodeURIComponent(token.value)}&channel=${ch}`,
     )
     if (res?.valid && Array.isArray(res.messages)) {
       thread.value = res.messages
     } else {
       await fetchPortal()
-      thread.value = (portalData.value?.messages as typeof thread.value) || []
+      const all = (portalData.value?.messages as MsgRow[]) || []
+      thread.value = all.filter((m) => messageChannel(m) === ch)
     }
   } catch (e: unknown) {
     thread.value = []
@@ -125,7 +180,7 @@ function connectSocket() {
     transports: ['websocket', 'polling'],
   })
   socket.on('family_message:new', (row: unknown) => {
-    const r = row as { id?: string; content?: string; direction?: string; created_at?: string }
+    const r = row as MsgRow
     mergeMessage(r)
   })
   socket.on('connect_error', (err) => {
@@ -142,7 +197,10 @@ async function send() {
       `${base}/api/v1/family-portal/messages?token=${encodeURIComponent(token.value)}`,
       {
         method: 'POST',
-        body: { message: draft.value.trim() },
+        body: {
+          message: draft.value.trim(),
+          channel_type: activeChannel.value,
+        },
       },
     )
     if (!res?.success) {
@@ -159,6 +217,10 @@ async function send() {
     sending.value = false
   }
 }
+
+watch(activeChannel, () => {
+  void load()
+})
 
 onMounted(() => {
   void load().then(() => {
