@@ -52,6 +52,9 @@
 </template>
 
 <script setup lang="ts">
+import { io, type Socket } from 'socket.io-client'
+import { toast } from 'vue-sonner'
+
 definePageMeta({ layout: false })
 
 const config = useRuntimeConfig()
@@ -62,12 +65,26 @@ const sending = ref(false)
 const draft = ref('')
 const thread = ref<Array<{ id?: string; content?: string; direction?: string; created_at?: string }>>([])
 
+let socket: Socket | null = null
+
 function formatDt(s: string) {
   try {
     return new Date(s).toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })
   } catch {
     return s
   }
+}
+
+function mergeMessage(row: {
+  id?: string
+  content?: string
+  direction?: string
+  created_at?: string
+}) {
+  if (!row?.id && !row?.content) return
+  const exists = thread.value.some((m) => row.id && m.id === row.id)
+  if (exists) return
+  thread.value = [...thread.value, row]
 }
 
 async function load() {
@@ -87,11 +104,33 @@ async function load() {
       await fetchPortal()
       thread.value = (portalData.value?.messages as typeof thread.value) || []
     }
-  } catch {
+  } catch (e: unknown) {
     thread.value = []
+    const err = e as { data?: { message?: string }; message?: string }
+    toast.error(err?.data?.message || err?.message || 'Could not load messages.')
   } finally {
     loading.value = false
   }
+}
+
+function connectSocket() {
+  socket?.disconnect()
+  socket = null
+  const tok = token.value
+  if (!tok) return
+  const base = String(config.public.apiUrl || '').replace(/\/+$/, '')
+  socket = io(`${base}/ws`, {
+    path: '/socket.io',
+    auth: { portalToken: tok },
+    transports: ['websocket', 'polling'],
+  })
+  socket.on('family_message:new', (row: unknown) => {
+    const r = row as { id?: string; content?: string; direction?: string; created_at?: string }
+    mergeMessage(r)
+  })
+  socket.on('connect_error', (err) => {
+    console.warn('[Family portal WS]', err.message)
+  })
 }
 
 async function send() {
@@ -99,21 +138,36 @@ async function send() {
   sending.value = true
   try {
     const base = String(config.public.apiUrl || '').replace(/\/+$/, '')
-    await $fetch(`${base}/api/v1/family-portal/messages?token=${encodeURIComponent(token.value)}`, {
-      method: 'POST',
-      body: { message: draft.value.trim() },
-    })
+    const res = await $fetch<{ success?: boolean; error?: string }>(
+      `${base}/api/v1/family-portal/messages?token=${encodeURIComponent(token.value)}`,
+      {
+        method: 'POST',
+        body: { message: draft.value.trim() },
+      },
+    )
+    if (!res?.success) {
+      toast.error(res?.error || 'Could not send message.')
+      return
+    }
     draft.value = ''
     await load()
     await fetchPortal()
-  } catch {
-    // toast optional
+  } catch (e: unknown) {
+    const err = e as { data?: { message?: string }; message?: string }
+    toast.error(err?.data?.message || err?.message || 'Could not send message.')
   } finally {
     sending.value = false
   }
 }
 
 onMounted(() => {
-  load()
+  void load().then(() => {
+    connectSocket()
+  })
+})
+
+onBeforeUnmount(() => {
+  socket?.disconnect()
+  socket = null
 })
 </script>
