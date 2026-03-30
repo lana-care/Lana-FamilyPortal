@@ -19,7 +19,15 @@ export interface FamilyPortalData {
   carePlan?: Record<string, unknown> | null
   recentVisits?: FamilyPortalVisit[]
   upcomingVisits?: FamilyPortalVisit[]
-  messages?: Array<{ id?: string; content?: string; direction?: string; created_at?: string; createdAt?: string }>
+  messages?: Array<{
+    id?: string
+    content?: string
+    direction?: string
+    created_at?: string
+    createdAt?: string
+    sender_name?: string | null
+    channel_type?: 'group' | 'private'
+  }>
 }
 
 export function usePortalAuth() {
