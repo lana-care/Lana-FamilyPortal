@@ -44,7 +44,12 @@ const visitDates = computed(() => {
   const set = new Set<string>()
   const add = (v: FamilyPortalVisit | undefined) => {
     if (!v?.date) return
-    const [y, m, d] = String(v.date).split('-').map(Number)
+    const datePart = String(v.date).split('T')[0] ?? ''
+    const parts = datePart.split('-').map(Number)
+    const y = parts[0]
+    const m = parts[1]
+    const d = parts[2]
+    if (y === undefined || m === undefined || d === undefined) return
     if (y === year && m - 1 === month) set.add(String(d))
   }
   for (const v of portalData.value?.upcomingVisits || []) add(v as FamilyPortalVisit)

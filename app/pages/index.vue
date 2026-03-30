@@ -282,16 +282,14 @@ const markedVisitDays = computed(() => {
   const set = new Set<number>()
   const y = calendarYear.value
   const m = calendarMonth.value
-  for (const v of portalData.value?.recentVisits || []) {
-    if (!v?.date) continue
-    const d = new Date(v.date)
-    if (d.getFullYear() === y && d.getMonth() === m) set.add(d.getDate())
+  const addDay = (dateStr: string | undefined) => {
+    if (!dateStr) return
+    const parts = String(dateStr).split('T')[0]?.split('-').map(Number) ?? []
+    const [py, pm, pd] = parts
+    if (py === y && pm === m + 1 && typeof pd === 'number') set.add(pd)
   }
-  for (const v of portalData.value?.upcomingVisits || []) {
-    if (!v?.date) continue
-    const d = new Date(v.date)
-    if (d.getFullYear() === y && d.getMonth() === m) set.add(d.getDate())
-  }
+  for (const v of portalData.value?.recentVisits || []) addDay(v?.date)
+  for (const v of portalData.value?.upcomingVisits || []) addDay(v?.date)
   return set
 })
 
