@@ -1,12 +1,10 @@
 export default defineNuxtRouteMiddleware((to) => {
-  if (to.path === '/login' || to.path === '/') {
-    return
-  }
-
-  const protectedPaths = ['/schedule', '/documents', '/feedback']
-  const isVisitDetail = /^\/visits\/[^/]+$/.test(to.path)
-
-  if (!protectedPaths.includes(to.path) && !isVisitDetail) {
+  // Public routes only: the landing page (which handles the invite token) and
+  // the login page. Everything else requires a portal token — guard by a
+  // public allowlist so new pages are protected by default (was: a stale
+  // protected-paths allowlist that left /messages, /care-plan, /medications and
+  // /calendar completely unguarded).
+  if (to.path === '/' || to.path === '/login') {
     return
   }
 

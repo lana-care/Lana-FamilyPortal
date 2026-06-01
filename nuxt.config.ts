@@ -7,6 +7,22 @@ export default defineNuxtConfig({
   },
   devtools: { enabled: true },
 
+  // Defense-in-depth security headers on every route. This is an externally
+  // facing portal handling health data: deny framing (clickjacking), prevent
+  // MIME sniffing, and avoid leaking the invite token via the Referer header.
+  // (Moving the token out of the URL + an httpOnly session cookie is a separate
+  // follow-up; no-referrer here limits the leak in the meantime.)
+  routeRules: {
+    '/**': {
+      headers: {
+        'X-Frame-Options': 'DENY',
+        'X-Content-Type-Options': 'nosniff',
+        'Referrer-Policy': 'no-referrer',
+        'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+      },
+    },
+  },
+
   devServer: {
     port: 3003,
     host: 'localhost',
