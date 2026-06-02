@@ -20,7 +20,7 @@
 }
 
 /* ============================================
-   LANA - Tailwind 4 Custom Theme
+   LUNA - Tailwind 4 Custom Theme
    Color Palette:
      1: #1e5cab (Primary Blue)
      2: #fdfef9 (Cream White)
@@ -31,21 +31,21 @@
    ============================================ */
 
 @theme {
-  /* Lana Blue scale */
-  --color-lana-*: initial;
-  --color-lana-50: #eef4fb;
-  --color-lana-100: #d5e3f5;
-  --color-lana-200: #aac7eb;
-  --color-lana-300: #7faade;
-  --color-lana-400: #5583b7;
-  --color-lana-500: #1e5cab;
-  --color-lana-600: #1a509a;
-  --color-lana-700: #154283;
-  --color-lana-800: #11356b;
-  --color-lana-900: #0d2854;
-  --color-lana-950: #081a38;
+  /* Luna Blue scale */
+  --color-luna-*: initial;
+  --color-luna-50: #eef4fb;
+  --color-luna-100: #d5e3f5;
+  --color-luna-200: #aac7eb;
+  --color-luna-300: #7faade;
+  --color-luna-400: #5583b7;
+  --color-luna-500: #1e5cab;
+  --color-luna-600: #1a509a;
+  --color-luna-700: #154283;
+  --color-luna-800: #11356b;
+  --color-luna-900: #0d2854;
+  --color-luna-950: #081a38;
 
-  /* Lana Lime scale */
+  /* Luna Lime scale */
   --color-lime-*: initial;
   --color-lime-50: #fafee8;
   --color-lime-100: #f3fcc4;
@@ -59,7 +59,7 @@
   --color-lime-900: #424c16;
   --color-lime-950: #222a08;
 
-  /* Lana Sage/Teal scale */
+  /* Luna Sage/Teal scale */
   --color-sage-*: initial;
   --color-sage-50: #f0f7f7;
   --color-sage-100: #daeaea;
@@ -103,7 +103,7 @@
 }
 
 /* ============================================
-   LANA - Shadcn-vue Theme Variables
+   LUNA - Shadcn-vue Theme Variables
    ============================================ */
 
 @theme inline {
@@ -155,7 +155,7 @@
   --card-foreground: #0d2854;
   --popover: #ffffff;
   --popover-foreground: #0d2854;
-  /* Primary: Lana Blue #1e5cab */
+  /* Primary: Luna Blue #1e5cab */
   --primary: #1e5cab;
   --primary-foreground: #ffffff;
   /* Secondary: light blue tint */
@@ -173,7 +173,7 @@
   --border: #d5e3f0;
   --input: #d5e3f0;
   --ring: #1e5cab;
-  /* Charts: Lana palette */
+  /* Charts: Luna palette */
   --chart-1: #1e5cab;
   --chart-2: #dbf26d;
   --chart-3: #5583b7;
