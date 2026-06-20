@@ -382,6 +382,24 @@
     }
   }
 
+  /* Opaque portaled surfaces (dropdowns, dialogs, selects, notification panels).
+     Use instead of glass-card whenever UI stacks over page content. */
+  .surface-overlay {
+    background: var(--popover);
+    color: var(--popover-foreground);
+    border: 1px solid var(--border);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.08),
+      0 16px 32px -12px rgba(0, 0, 0, 0.14);
+  }
+  .dark .surface-overlay {
+    background: var(--popover);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow:
+      0 12px 40px -8px rgba(0, 0, 0, 0.55),
+      0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+  }
+
   .glass-pill {
     background: color-mix(in oklab, var(--card) 60%, transparent);
     backdrop-filter: blur(16px) saturate(140%);
